@@ -24,3 +24,5 @@ __all__ = [
 # Commit 3: feat(ring): add synchronous P2P ring communication exchange
 
 # Commit 4: test(ring): add simulated multi-rank ring all-reduce verification
+
+# Commit 5: perf(comm): optimize ring buffer allocations to avoid page faults
