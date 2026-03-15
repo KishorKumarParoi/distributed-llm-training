@@ -34,3 +34,5 @@ __all__ = [
 # Commit 8: math(rope): verify complex rotation invariance across query/key projections
 
 # Commit 9: feat(swiglu): add fused SwiGLU feed-forward network with SiLU gating
+
+# Commit 10: feat(mha): implement grouped-query attention (GQA) with causal masking
