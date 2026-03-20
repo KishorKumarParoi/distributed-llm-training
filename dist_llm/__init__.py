@@ -42,3 +42,5 @@ __all__ = [
 # Commit 12: feat(model): complete LlamaForCausalLM model with next-token prediction head
 
 # Commit 13: test(model): add unit tests for RoPE, RMSNorm, SwiGLU and causal masking
+
+# Commit 14: feat(tp): implement Megatron-LM ColumnParallelLinear with identity forward
