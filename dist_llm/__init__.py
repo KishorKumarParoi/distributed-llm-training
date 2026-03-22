@@ -46,3 +46,5 @@ __all__ = [
 # Commit 14: feat(tp): implement Megatron-LM ColumnParallelLinear with identity forward
 
 # Commit 15: feat(tp): implement Megatron-LM RowParallelLinear with all-reduce forward
+
+# Commit 16: feat(tp): add autograd functions for model parallel copy, scatter and gather
