@@ -48,3 +48,5 @@ __all__ = [
 # Commit 15: feat(tp): implement Megatron-LM RowParallelLinear with all-reduce forward
 
 # Commit 16: feat(tp): add autograd functions for model parallel copy, scatter and gather
+
+# Commit 17: feat(tp): implement TensorParallelAttention with column QKV and row O projection
