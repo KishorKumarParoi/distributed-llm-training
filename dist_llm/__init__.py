@@ -58,3 +58,5 @@ __all__ = [
 # Commit 20: feat(zero): implement ZeRO Stage 1 optimizer state partitioning across DP ranks
 
 # Commit 21: feat(zero): add reduce-scatter gradient aggregation for ZeRO Stage 2
+
+# Commit 22: feat(pipeline): implement 1F1B (One-Forward-One-Backward) schedule state machine
