@@ -66,3 +66,5 @@ __all__ = [
 # Commit 24: feat(pipeline): add activation FIFO buffer management for steady-state 1F1B
 
 # Commit 25: test(zero): add unit tests for ZeRO-1 parameter partitioning
+
+# Commit 26: feat(optim): implement fused AdamW optimizer with decoupled weight decay
