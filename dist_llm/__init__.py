@@ -70,3 +70,5 @@ __all__ = [
 # Commit 26: feat(optim): implement fused AdamW optimizer with decoupled weight decay
 
 # Commit 27: feat(optim): add distributed global gradient norm clipping across sharded ranks
+
+# Commit 28: feat(scheduler): implement cosine annealing with linear warmup scheduler
