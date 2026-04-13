@@ -86,3 +86,5 @@ __all__ = [
 # Commit 34: bench(throughput): benchmark tokens/sec throughput across varying TP and DP scales
 
 # Commit 35: docs(architecture): document 3D parallelism topology with Mermaid diagrams
+
+# Commit 36: docs(math): add full LaTeX mathematical derivations for communication costs
