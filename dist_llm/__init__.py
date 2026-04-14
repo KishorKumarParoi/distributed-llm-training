@@ -88,3 +88,5 @@ __all__ = [
 # Commit 35: docs(architecture): document 3D parallelism topology with Mermaid diagrams
 
 # Commit 36: docs(math): add full LaTeX mathematical derivations for communication costs
+
+# Commit 37: ci(docker): add multi-stage CUDA 12.4 Dockerfile with PyTorch environment
