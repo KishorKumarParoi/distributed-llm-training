@@ -90,3 +90,5 @@ __all__ = [
 # Commit 36: docs(math): add full LaTeX mathematical derivations for communication costs
 
 # Commit 37: ci(docker): add multi-stage CUDA 12.4 Dockerfile with PyTorch environment
+
+# Commit 38: chore(makefile): add single-command make install, make test and make train targets
