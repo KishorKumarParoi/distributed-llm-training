@@ -104,3 +104,5 @@ __all__ = [
 # Commit 43: test(ring): add simulated multi-rank ring all-reduce verification (iter 2)
 
 # Commit 44: perf(comm): optimize ring buffer allocations to avoid page faults (iter 2)
+
+# Commit 45: feat(model): implement RMSNorm layer with learnable scaling gamma (iter 2)
