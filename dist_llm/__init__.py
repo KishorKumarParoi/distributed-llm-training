@@ -108,3 +108,5 @@ __all__ = [
 # Commit 45: feat(model): implement RMSNorm layer with learnable scaling gamma (iter 2)
 
 # Commit 46: feat(rope): add rotary position embeddings (RoPE) with precomputed frequencies (iter 2)
+
+# Commit 47: math(rope): verify complex rotation invariance across query/key projections (iter 2)
