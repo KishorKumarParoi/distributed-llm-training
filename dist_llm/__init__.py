@@ -110,3 +110,5 @@ __all__ = [
 # Commit 46: feat(rope): add rotary position embeddings (RoPE) with precomputed frequencies (iter 2)
 
 # Commit 47: math(rope): verify complex rotation invariance across query/key projections (iter 2)
+
+# Commit 48: feat(swiglu): add fused SwiGLU feed-forward network with SiLU gating (iter 2)
