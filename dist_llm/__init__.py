@@ -116,3 +116,5 @@ __all__ = [
 # Commit 49: feat(mha): implement grouped-query attention (GQA) with causal masking (iter 2)
 
 # Commit 50: feat(model): assemble Llama-3 decoder transformer block with residual streams (iter 2)
+
+# Commit 51: feat(model): complete LlamaForCausalLM model with next-token prediction head (iter 2)
