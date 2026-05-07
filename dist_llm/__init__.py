@@ -130,3 +130,5 @@ __all__ = [
 # Commit 56: feat(tp): implement TensorParallelAttention with column QKV and row O projection (iter 2)
 
 # Commit 57: feat(tp): implement TensorParallelMLP with column gate/up and row down projection (iter 2)
+
+# Commit 58: test(tp): verify numerical equivalence between single-GPU and tensor parallel layers (iter 2)
