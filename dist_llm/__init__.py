@@ -138,3 +138,5 @@ __all__ = [
 # Commit 60: feat(zero): add reduce-scatter gradient aggregation for ZeRO Stage 2 (iter 2)
 
 # Commit 61: feat(pipeline): implement 1F1B (One-Forward-One-Backward) schedule state machine (iter 2)
+
+# Commit 62: math(pipeline): derive (P-1)/(M+P-1) bubble latency fraction formula (iter 2)
