@@ -178,3 +178,5 @@ __all__ = [
 # Commit 80: math(ring): derive 2*(P-1)/P * N * B bandwidth communication bounds (iter 3)
 
 # Commit 81: feat(ring): add synchronous P2P ring communication exchange (iter 3)
+
+# Commit 82: test(ring): add simulated multi-rank ring all-reduce verification (iter 3)
