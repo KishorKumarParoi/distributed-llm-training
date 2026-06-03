@@ -180,3 +180,5 @@ __all__ = [
 # Commit 81: feat(ring): add synchronous P2P ring communication exchange (iter 3)
 
 # Commit 82: test(ring): add simulated multi-rank ring all-reduce verification (iter 3)
+
+# Commit 83: perf(comm): optimize ring buffer allocations to avoid page faults (iter 3)
