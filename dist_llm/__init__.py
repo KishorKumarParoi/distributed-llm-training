@@ -192,3 +192,5 @@ __all__ = [
 # Commit 87: feat(swiglu): add fused SwiGLU feed-forward network with SiLU gating (iter 3)
 
 # Commit 88: feat(mha): implement grouped-query attention (GQA) with causal masking (iter 3)
+
+# Commit 89: feat(model): assemble Llama-3 decoder transformer block with residual streams (iter 3)
