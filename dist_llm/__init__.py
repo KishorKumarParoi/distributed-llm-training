@@ -196,3 +196,5 @@ __all__ = [
 # Commit 89: feat(model): assemble Llama-3 decoder transformer block with residual streams (iter 3)
 
 # Commit 90: feat(model): complete LlamaForCausalLM model with next-token prediction head (iter 3)
+
+# Commit 91: test(model): add unit tests for RoPE, RMSNorm, SwiGLU and causal masking (iter 3)
