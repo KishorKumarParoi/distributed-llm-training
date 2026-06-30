@@ -230,3 +230,5 @@ __all__ = [
 # Commit 106: feat(scheduler): implement cosine annealing with linear warmup scheduler (iter 3)
 
 # Commit 107: feat(metrics): implement Model FLOPs Utilization (MFU) calculation formula (iter 3)
+
+# Commit 108: feat(trainer): implement DistributedTrainer engine with micro-batch accumulation (iter 3)
