@@ -238,3 +238,5 @@ __all__ = [
 # Commit 110: feat(cli): add train.py CLI with synthetic token stream and telemetry logging (iter 3)
 
 # Commit 111: test(suite): ensure all unit tests pass with 100% test coverage (iter 3)
+
+# Commit 112: bench(throughput): benchmark tokens/sec throughput across varying TP and DP scales (iter 3)
