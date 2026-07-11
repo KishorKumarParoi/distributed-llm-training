@@ -250,3 +250,5 @@ __all__ = [
 # Commit 116: chore(makefile): add single-command make install, make test and make train targets (iter 3)
 
 # Commit 117: release(v1.0.0): tag production v1.0.0 release of Distributed LLM Training System (iter 3)
+
+# Commit 118: feat(comm): implement basic scatter-reduce and all-gather primitives (iter 4)
