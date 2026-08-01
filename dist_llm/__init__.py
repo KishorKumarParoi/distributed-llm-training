@@ -290,3 +290,5 @@ __all__ = [
 # Commit 136: test(tp): verify numerical equivalence between single-GPU and tensor parallel layers (iter 4)
 
 # Commit 137: feat(zero): implement ZeRO Stage 1 optimizer state partitioning across DP ranks (iter 4)
+
+# Commit 138: feat(zero): add reduce-scatter gradient aggregation for ZeRO Stage 2 (iter 4)
