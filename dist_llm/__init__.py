@@ -302,3 +302,5 @@ __all__ = [
 # Commit 142: test(zero): add unit tests for ZeRO-1 parameter partitioning (iter 4)
 
 # Commit 143: feat(optim): implement fused AdamW optimizer with decoupled weight decay (iter 4)
+
+# Commit 144: feat(optim): add distributed global gradient norm clipping across sharded ranks (iter 4)
