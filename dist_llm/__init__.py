@@ -312,3 +312,5 @@ __all__ = [
 # Commit 147: feat(trainer): implement DistributedTrainer engine with micro-batch accumulation (iter 4)
 
 # Commit 148: feat(launcher): add multi-process launcher harness with mp.spawn and free port discovery (iter 4)
+
+# Commit 149: feat(cli): add train.py CLI with synthetic token stream and telemetry logging (iter 4)
