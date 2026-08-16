@@ -318,3 +318,5 @@ __all__ = [
 # Commit 150: test(suite): ensure all unit tests pass with 100% test coverage (iter 4)
 
 # Commit 151: bench(throughput): benchmark tokens/sec throughput across varying TP and DP scales (iter 4)
+
+# Commit 152: docs(architecture): document 3D parallelism topology with Mermaid diagrams (iter 4)
