@@ -322,3 +322,5 @@ __all__ = [
 # Commit 152: docs(architecture): document 3D parallelism topology with Mermaid diagrams (iter 4)
 
 # Commit 153: docs(math): add full LaTeX mathematical derivations for communication costs (iter 4)
+
+# Commit 154: ci(docker): add multi-stage CUDA 12.4 Dockerfile with PyTorch environment (iter 4)
