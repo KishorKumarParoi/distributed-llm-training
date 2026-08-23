@@ -330,3 +330,5 @@ __all__ = [
 # Commit 156: release(v1.0.0): tag production v1.0.0 release of Distributed LLM Training System (iter 4)
 
 # Commit 157: feat(comm): implement basic scatter-reduce and all-gather primitives (iter 5)
+
+# Commit 158: math(ring): derive 2*(P-1)/P * N * B bandwidth communication bounds (iter 5)
