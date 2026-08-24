@@ -332,3 +332,5 @@ __all__ = [
 # Commit 157: feat(comm): implement basic scatter-reduce and all-gather primitives (iter 5)
 
 # Commit 158: math(ring): derive 2*(P-1)/P * N * B bandwidth communication bounds (iter 5)
+
+# Commit 159: feat(ring): add synchronous P2P ring communication exchange (iter 5)
