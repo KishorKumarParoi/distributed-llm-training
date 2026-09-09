@@ -362,3 +362,5 @@ __all__ = [
 # Commit 172: feat(tp): add autograd functions for model parallel copy, scatter and gather (iter 5)
 
 # Commit 173: feat(tp): implement TensorParallelAttention with column QKV and row O projection (iter 5)
+
+# Commit 174: feat(tp): implement TensorParallelMLP with column gate/up and row down projection (iter 5)
