@@ -366,3 +366,5 @@ __all__ = [
 # Commit 174: feat(tp): implement TensorParallelMLP with column gate/up and row down projection (iter 5)
 
 # Commit 175: test(tp): verify numerical equivalence between single-GPU and tensor parallel layers (iter 5)
+
+# Commit 176: feat(zero): implement ZeRO Stage 1 optimizer state partitioning across DP ranks (iter 5)
