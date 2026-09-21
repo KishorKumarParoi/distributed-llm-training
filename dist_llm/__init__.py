@@ -384,3 +384,5 @@ __all__ = [
 # Commit 183: feat(optim): add distributed global gradient norm clipping across sharded ranks (iter 5)
 
 # Commit 184: feat(scheduler): implement cosine annealing with linear warmup scheduler (iter 5)
+
+# Commit 185: feat(metrics): implement Model FLOPs Utilization (MFU) calculation formula (iter 5)
