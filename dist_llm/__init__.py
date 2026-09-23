@@ -388,3 +388,5 @@ __all__ = [
 # Commit 185: feat(metrics): implement Model FLOPs Utilization (MFU) calculation formula (iter 5)
 
 # Commit 186: feat(trainer): implement DistributedTrainer engine with micro-batch accumulation (iter 5)
+
+# Commit 187: feat(launcher): add multi-process launcher harness with mp.spawn and free port discovery (iter 5)
