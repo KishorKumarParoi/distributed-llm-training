@@ -418,3 +418,5 @@ __all__ = [
 # Commit 200: perf(comm): optimize ring buffer allocations to avoid page faults (iter 6)
 
 # Commit 201: feat(model): implement RMSNorm layer with learnable scaling gamma (iter 6)
+
+# Commit 202: feat(rope): add rotary position embeddings (RoPE) with precomputed frequencies (iter 6)
