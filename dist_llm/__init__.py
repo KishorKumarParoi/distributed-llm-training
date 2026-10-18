@@ -434,3 +434,5 @@ __all__ = [
 # Commit 208: test(model): add unit tests for RoPE, RMSNorm, SwiGLU and causal masking (iter 6)
 
 # Commit 209: feat(tp): implement Megatron-LM ColumnParallelLinear with identity forward (iter 6)
+
+# Commit 210: feat(tp): implement Megatron-LM RowParallelLinear with all-reduce forward (iter 6)
