@@ -452,3 +452,5 @@ __all__ = [
 # Commit 217: feat(pipeline): implement 1F1B (One-Forward-One-Backward) schedule state machine (iter 6)
 
 # Commit 218: math(pipeline): derive (P-1)/(M+P-1) bubble latency fraction formula (iter 6)
+
+# Commit 219: feat(pipeline): add activation FIFO buffer management for steady-state 1F1B (iter 6)
