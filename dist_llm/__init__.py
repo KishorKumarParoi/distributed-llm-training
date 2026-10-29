@@ -454,3 +454,5 @@ __all__ = [
 # Commit 218: math(pipeline): derive (P-1)/(M+P-1) bubble latency fraction formula (iter 6)
 
 # Commit 219: feat(pipeline): add activation FIFO buffer management for steady-state 1F1B (iter 6)
+
+# Commit 220: test(zero): add unit tests for ZeRO-1 parameter partitioning (iter 6)
