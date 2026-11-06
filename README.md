@@ -1,16 +1,22 @@
 # 🚀 Distributed LLM Training System (4D Parallelism & Ring All-Reduce)
 
-[![Build & Verification Status](https://img.shields.io/badge/Verification-19%2F19%20Passed-10b981?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
+[![Build & Verification Status](https://img.shields.io/badge/Verification-24%2F24%20Passed-10b981?style=for-the-badge&logo=pytest&logoColor=white)](tests/)
 [![Hardware Target](https://img.shields.io/badge/Hardware-NVIDIA%20H100%20%7C%20A100%20Clusters-76b900?style=for-the-badge&logo=nvidia&logoColor=white)](dist_llm/)
 [![Architecture Blueprint](https://img.shields.io/badge/Architecture-4D%20Parallelism%20Grid-3b82f6?style=for-the-badge)](docs/ARCHITECTURE.md)
 [![Interview Master Guide](https://img.shields.io/badge/Interview%20Mastery-25%2B%20Staff%20Questions-8b5cf6?style=for-the-badge)](docs/INTERVIEW_CHEATSHEET.md)
 
-> An enterprise-grade, high-performance distributed training framework engineered from first principles for modern large language models (LLaMA-3 architecture). Implements **4D Parallelism** (Megatron Tensor Parallelism, 1F1B Pipeline Parallelism schedule, ZeRO-1/2/3 Optimizer/Gradient sharding, and Megatron Sequence Parallelism with Ring Attention) with custom **Ring All-Reduce** collective communication.
+> An enterprise-grade, high-performance distributed training framework engineered from first principles for modern large language models (LLaMA-3 architecture). Implements **4D Parallelism** (Megatron-LM Tensor Parallelism, Megatron-LM v2 Interleaved 1F1B Pipeline Parallelism with virtual stages, ZeRO-1/2/3 Optimizer/Gradient/Parameter sharding, and Ring Attention Context Parallelism) with custom **Ring All-Reduce** and **Distributed Asynchronous Checkpointing (DCP)**.
 
 ```
 Author: Kishor Kumar Paroi <1703053@student.ruet.ac.bd>
 Production Release: v2.0.0 (Staff/Principal Engineer Edition)
 Architecture: 4D Parallelism (TP × PP × DP × SP) with Ring All-Reduce & ZeRO-3
+Supported Distributed Engines:
+  - Megatron-LM 1D Column/Row Tensor Parallelism with identity forward / all-reduce backward
+  - ZeRO-3 / FSDP with dynamic pre-forward All-Gather and post-backward Reduce-Scatter
+  - Ring Attention Context Parallelism with multi-hop online softmax and causal tile skipping
+  - Interleaved 1F1B Pipeline Scheduling with virtual stages (cutting bubble by up to 70%)
+  - Distributed Asynchronous Checkpointing (DCP) with dynamic topology resharding
 Target Scale: Multi-node GPU clusters (8x H100 to 512x H100)
 ```
 

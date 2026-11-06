@@ -27,3 +27,4 @@ def test_ring_attention_equivalence():
     out = RingAttentionBlock.ring_kv_rotate(q, k, v, num_ranks=num_ranks, rank=0)
     assert out.shape == (batch, seq_local, num_heads, head_dim)
     assert not torch.isnan(out).any()
+

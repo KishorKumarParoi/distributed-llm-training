@@ -47,10 +47,12 @@ def train_worker(rank: int, world_size: int, args):
 
     if rank == 0:
         print("=" * 70)
-        print("🚀 Distributed LLM Training System Initialized")
+        print("🚀 Distributed LLM Training System Initialized (v2.0 4D Parallel)")
         print(f"• World Size: {world_size} workers | Backend: {'NCCL' if torch.cuda.is_available() else 'GLOO'}")
         print(f"• Model Parameters: {trainer.num_params:,} ({trainer.num_params / 1e6:.2f}M)")
-        print(f"• Parallelism: 3D Grid | ZeRO Stage: {train_config.zero_stage}")
+        print(f"• Parallelism: 4D Mesh (TP x PP x DP x SP) | ZeRO Stage: {train_config.zero_stage}")
+        print(f"• Ring Attention: {'Active' if getattr(args, 'enable_ring_attention', False) else 'Disabled'}")
+        print(f"• Interleaved 1F1B: {'Active (v=' + str(args.virtual_stages) + ')' if getattr(args, 'interleaved_1f1b', False) else 'Standard'}")
         print(f"• Sequence Length: {args.seq_len} tokens | Global Batch Size: {args.batch_size}")
         print("=" * 70)
 
@@ -75,11 +77,23 @@ def train_worker(rank: int, world_size: int, args):
                 f"MFU: {metrics.mfu_percentage:4.2f}%"
             )
 
+    if getattr(args, "save_dcp", False):
+        from dist_llm.engine.checkpoint import save_distributed_checkpoint
+        save_distributed_checkpoint(
+            trainer.model.state_dict(),
+            "checkpoints/dcp",
+            rank=rank,
+            world_size=world_size,
+            step=train_config.max_steps,
+        )
+
     if rank == 0:
         save_path = "checkpoints/llama_final.pt"
         trainer.save_checkpoint(train_config.max_steps, save_path)
         print("=" * 70)
         print(f"✅ Training converged successfully. Checkpoint saved to {save_path}")
+        if getattr(args, "save_dcp", False):
+            print("💾 Distributed Checkpoint (DCP) saved across all ranks to checkpoints/dcp/")
         print("=" * 70)
 
 
@@ -98,7 +112,11 @@ def main():
     parser.add_argument("--lr", type=float, default=5e-4, help="Max learning rate")
     parser.add_argument("--max-steps", type=int, default=25, help="Training steps")
     parser.add_argument("--warmup-steps", type=int, default=5, help="Warmup steps")
-    parser.add_argument("--zero-stage", type=int, default=1, help="ZeRO Stage (0, 1, 2)")
+    parser.add_argument("--zero-stage", type=int, default=1, choices=[0, 1, 2, 3], help="ZeRO Stage (0=None, 1=Optimizer, 2=Gradients, 3=Parameters/FSDP)")
+    parser.add_argument("--enable-ring-attention", action="store_true", help="Enable Ring Attention context parallelism")
+    parser.add_argument("--interleaved-1f1b", action="store_true", help="Enable Megatron-LM v2 virtual stages pipelining")
+    parser.add_argument("--virtual-stages", type=int, default=2, help="Virtual stages per physical rank for interleaved 1F1B")
+    parser.add_argument("--save-dcp", action="store_true", help="Save distributed asynchronous checkpoint (DCP)")
     args = parser.parse_args()
 
     # If launched via torchrun, rank and world_size are set in environment

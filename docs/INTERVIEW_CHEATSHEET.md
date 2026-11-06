@@ -107,3 +107,66 @@ A world-class distributed cluster achieves **$45\% - 55\%$ MFU** on NVIDIA H100s
    Maintain a scale factor $S$. If gradients are healthy for $N=2000$ steps, $S \leftarrow 2S$. If an overflow occurs, $S \leftarrow S / 2$ and discard step.
 3. **Asynchronous Non-Blocking Checkpointing:**
    Do not pause GPUs during checkpoint writes. Copy weights from HBM to CPU Pinned Memory via high-speed PCIe Gen5 (taking $<200\text{ms}$), then let a background Python daemon stream the snapshot to NVMe/S3 asynchronously.
+
+---
+
+### Q7: How does Interleaved 1F1B (Megatron-LM v2) mathematically reduce pipeline bubble latency compared to standard 1F1B?
+**Answer:**
+- **Standard 1F1B:**
+  Each physical rank hosts 1 contiguous stage of layers. The pipeline bubble fraction is:
+  $$F_{\text{bubble}} = \frac{P - 1}{M + P - 1}$$
+  where $P$ is the physical stages and $M$ is the microbatches. If $P=8$ and $M=32$, bubble time is $\approx 17.9\%$.
+- **Interleaved 1F1B (Virtual Stages):**
+  Each physical rank hosts $v$ virtual chunks (e.g. $v=2$ or $4$). The pipeline consists of $P \times v$ smaller stages. Rank $r$ manages stages $\{r, r + P, \dots, r + (v - 1)P\}$.
+  Because each stage is $v\times$ smaller, the warmup and cooldown transitions execute $v\times$ faster:
+  $$F_{\text{bubble\_interleaved}} \approx \frac{P - 1}{v \cdot M}$$
+  For $P=8, M=32, v=2$, the bubble fraction drops to $10.9\%$; for $v=4$, it drops to $5.4\%$, cutting idle GPU waste by up to **$70\%$**.
+- **Trade-off:**
+  Interleaved 1F1B requires $v\times$ more P2P communication steps between ranks, so it is optimal when P2P bandwidth (e.g. NVLink or InfiniBand) is fast enough that communication latency does not dominate the stage execution time.
+
+---
+
+### Q8: How does Ring Attention implement Context Parallelism without centralizing the KV cache, and how does causal masking operate across ring hops?
+**Answer:**
+- **Mechanism:**
+  For an overall context length $S = N_{\text{CP}} \times S_{\text{local}}$, each rank $r$ holds local query, key, and value chunks of size $S_{\text{local}}$.
+  Instead of gathering all keys and values to each rank (which would require $O(S)$ HBM and trigger OOMs), ranks circulate $K$ and $V$ in a logical ring across $N_{\text{CP}}$ hops.
+- **Online Softmax across Hops:**
+  In each hop, rank $r$ calculates local dot products with the currently received $K, V$ chunk and updates its running online softmax state $(m_i, l_i, \mathbf{O}_i)$:
+  $$m_{\text{new}} = \max(m_{\text{old}}, m_{\text{tile}}), \quad \alpha = \exp(m_{\text{old}} - m_{\text{new}})$$
+  $$l_{\text{new}} = l_{\text{old}} \cdot \alpha + \sum \exp(S_{\text{tile}} - m_{\text{new}}), \quad \mathbf{O}_{\text{new}} = \mathbf{O}_{\text{old}} \cdot \alpha + \mathbf{P}_{\text{tile}} \mathbf{V}_{\text{tile}}$$
+- **Causal Masking Rule:**
+  At ring step $k$, rank $r$ receives $K, V$ from source rank $s = (r - k + N_{\text{CP}}) \bmod N_{\text{CP}}$:
+  1. If $s > r$: Source is in the causal future $\implies$ **Skip entire tile** (zero FLOPs, zero memory writes).
+  2. If $s == r$: Diagonal self-block $\implies$ Apply standard lower-triangular causal mask.
+  3. If $s < r$: Source is strictly in the past $\implies$ Attend to all tokens with zero masking.
+- **Overlap:**
+  By double-buffering communication on a dedicated CUDA stream while the Tensor Cores compute the current tile on the compute stream, P2P network latency is **100% hidden**.
+
+---
+
+### Q9: Compare Ring Attention with DeepSpeed Ulysses (All-to-All Sequence Parallelism). What are the scaling trade-offs?
+**Answer:**
+| Dimension | Ring Attention (Liu et al., 2023) | DeepSpeed Ulysses (Jacobs et al., 2023) |
+| :--- | :--- | :--- |
+| **Communication Collective** | P2P `send` / `recv` in a logical ring | `All-to-All` collective across attention heads |
+| **Head Dimension Constraint** | None (works with any number of heads, even $H < N_{\text{CP}}$) | Requires $H \ge N_{\text{SP}}$ (number of heads must be divisible by SP world size) |
+| **Memory per GPU** | Strictly $O(S / N_{\text{CP}})$ in SRAM | $O(S / N_{\text{SP}})$ along sequence, then resharded to heads |
+| **Comm-Comp Overlap** | **Near 100% overlap** (P2P overlaps with block GEMM) | Blocked All-to-All synchronization point before attention |
+| **Max Sequence Scaling** | Millions of tokens ($1\text{M} - 10\text{M}$) | Limited by number of query heads (e.g. 32 or 64 ranks) |
+
+---
+
+### Q10: How does Distributed Asynchronous Checkpointing (DCP) eliminate storage bottlenecks, and how does Topology Resharding work?
+**Answer:**
+- **The Bottleneck in Traditional Checkpointing:**
+  Gathering model weights to rank 0 over network collectives and serializing a 140 GB file causes severe PCIe bottlenecks, CPU RAM exhaustion, and multi-minute cluster hangs during periodic saving.
+- **DCP Architecture:**
+  1. Each rank directly writes its local tensor shard (e.g., column-parallel weight slice or ZeRO parameter slice) to its own parallel checkpoint file `checkpoint_rank_{r}_of_{N}.pt`.
+  2. Rank 0 writes a tiny JSON manifest `manifest.json` recording global metadata and sharding dimensions.
+  3. Writes occur concurrently across NVMe drives or distributed object stores (S3/GCS) in parallel.
+- **Dynamic Topology Resharding:**
+  When loading the checkpoint onto a cluster with different parallel dimensions (e.g. trained with $TP=4, DP=2$, but serving on a single GPU with $TP=1$ or on an edge node with $TP=2$):
+  - The resharding loader reads the manifest, detects that $TP_{\text{source}} \ne TP_{\text{target}}$, reconstructs full weight tensors along sharded axes (dim 0 for column-parallel, dim 1 for row-parallel), and reslices them into target shard widths on-the-fly with zero loss or precision corruption.
+
+

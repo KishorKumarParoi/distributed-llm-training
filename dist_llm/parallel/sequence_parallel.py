@@ -92,3 +92,4 @@ class RingAttentionBlock:
         l_i_t = l_i.transpose(1, 2)
         out = o_acc / torch.clamp(l_i_t, min=1e-6)
         return out
+

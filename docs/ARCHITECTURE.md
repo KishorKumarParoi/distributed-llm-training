@@ -123,3 +123,60 @@ When $M = 8P$, bubble overhead drops below **$11\%$**.
 | **Host-to-Device Bus** | PCIe Gen5 x16 | **64 GB/s** | CPU offload / Pinned Host Checkpoints |
 | **Inter-Node Fabric** | 8x InfiniBand NDR | **400 Gbps (50 GB/s)** | ZeRO / DP AllGather & ReduceScatter |
 | **WAN Cross-DC** | 100 GbE Ethernet | **12.5 GB/s** | Asynchronous Checkpoint Mirroring |
+
+---
+
+## 🔬 4. ZeRO-3 / FSDP Dynamic Weight Lifecycle
+
+### 4.1 Forward Pass Lifecycle
+1. **Pre-Forward Hook:** Issue non-blocking `All-Gather` across the DP process group to reconstruct the full layer weights $\mathbf{W} \in \mathbb{R}^{d_{\text{out}} \times d_{\text{in}}}$.
+2. **Compute:** Execute $\mathbf{Y} = \mathbf{X} \mathbf{W}^T$.
+3. **Post-Forward Hook:** Immediately free $\mathbf{W}$, preserving only the local $\frac{1}{N_{\text{DP}}}$ shard $\mathbf{W}_{\text{shard}}$.
+
+### 4.2 Backward Pass Lifecycle
+1. **Pre-Backward Hook:** Issue `All-Gather` to reconstruct $\mathbf{W}$.
+2. **Compute:** Compute input activations gradient $d\mathbf{X} = d\mathbf{Y} \mathbf{W}$ and parameter gradients $d\mathbf{W} = d\mathbf{Y}^T \mathbf{X}$.
+3. **Post-Backward Hook:** Execute `Reduce-Scatter` on $d\mathbf{W}$, accumulating only the local gradient shard $d\mathbf{W}_{\text{shard}}$ on this rank, and immediately free the full tensor $\mathbf{W}$.
+
+---
+
+## 🔄 5. Context Parallelism: Ring Attention & Online Softmax
+
+For extremely long sequences ($S = 1\text{M}+$ tokens), Ring Attention partitions the sequence into $N_{\text{CP}}$ shards of length $S_{\text{local}} = S / N_{\text{CP}}$.
+Instead of centralizing the KV cache, ranks circulate $K$ and $V$ blocks in a physical network ring:
+- **Step 0:** Attend local $Q_r$ to local $K_r, V_r$. Initialize online softmax state $(m_r, l_r, \mathbf{O}_r)$.
+- **Steps $1 \dots N_{\text{CP}}-1$:**
+  - Asynchronously send $K, V$ to rank $(r + 1) \bmod N_{\text{CP}}$ and receive from $(r - 1 + N_{\text{CP}}) \bmod N_{\text{CP}}$ on a dedicated communication stream.
+  - Concurrently compute attention between $Q_r$ and received $K, V$ tile on the computation stream.
+  - Update online softmax statistics:
+    $$m_{\text{new}} = \max(m_{\text{old}}, m_{\text{tile}}), \quad \alpha = \exp(m_{\text{old}} - m_{\text{new}})$$
+    $$l_{\text{new}} = l_{\text{old}} \cdot \alpha + \sum \exp(S_{\text{tile}} - m_{\text{new}})$$
+    $$\mathbf{O}_{\text{new}} = \mathbf{O}_{\text{old}} \cdot \alpha + \mathbf{P}_{\text{tile}} \mathbf{V}_{\text{tile}}$$
+- **Causal Optimization:** If source rank $s > r$, the entire KV tile is in the causal future and is skipped with zero FLOPs and zero memory access.
+
+---
+
+## 📉 6. Megatron-LM v2 Interleaved 1F1B Pipelining
+
+Standard 1F1B incurs a bubble fraction $F_{\text{bubble}} = \frac{P - 1}{M + P - 1}$.
+Interleaved 1F1B partitions each physical rank into $v$ virtual stages:
+- Total virtual pipeline depth: $P_{\text{virtual}} = P \times v$.
+- Physical rank $r$ hosts stages $\{r, r + P, \dots, r + (v - 1)P\}$.
+- **Mathematical Bubble Reduction:**
+  $$F_{\text{bubble\_interleaved}} \approx \frac{P - 1}{v \cdot M}$$
+For $P=8$ physical nodes and $M=32$ microbatches:
+- $v=1$ (Standard 1F1B): $F_{\text{bubble}} = 17.9\%$
+- $v=2$ (2 Virtual Chunks): $F_{\text{bubble}} = 10.9\%$
+- $v=4$ (4 Virtual Chunks): $F_{\text{bubble}} = 5.4\%$
+Cuts bubble overhead by up to **$70\%$** while bounding activation memory to $O(P \cdot v)$.
+
+---
+
+## 💾 7. Distributed Asynchronous Checkpointing (DCP) & Topology Resharder
+
+- **Non-Blocking Parallel I/O:** Every rank writes its local state dict shard directly to NVMe storage in parallel without gathering to rank 0, slashing checkpoint write times by $N_{\text{world}} \times$.
+- **Dynamic Topology Resharder:** Reconstructs full weight matrices or slices them to match any target configuration on the fly:
+  $$\text{Target Weight} = \text{Slice}_{\text{target\_rank}}\left(\text{Cat}_{r=0}^{TP_{\text{source}}-1}\left(\mathbf{W}_r\right)\right)$$
+  Enables training on 64 GPUs with $TP=4$ and seamlessly deploying for inference on 1 GPU or $TP=2$ clusters with zero manual weights conversion scripts.
+
+

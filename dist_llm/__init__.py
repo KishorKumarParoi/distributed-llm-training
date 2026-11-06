@@ -1,19 +1,31 @@
 """
 Distributed LLM Training System
-Production-grade 3D Parallelism Suite: Megatron-LM Tensor Parallelism,
-ZeRO-1/ZeRO-2 Data Parallelism, 1F1B Pipeline Scheduling, and Ring All-Reduce.
+Production-grade 4D Parallelism Suite: Megatron-LM Tensor Parallelism,
+ZeRO-1/2/3 Data Parallelism, Interleaved 1F1B Pipeline Scheduling, and Ring Attention.
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "Kishor Kumar Paroi <1703053@student.ruet.ac.bd>"
 
 from dist_llm.config import ModelConfig, TrainingConfig
 from dist_llm.model import LlamaForCausalLM
+from dist_llm.parallel.zero3 import ZeRO3Linear, ZeRO3ModuleWrapper
+from dist_llm.parallel.ring_attention import RingAttentionEngine
+from dist_llm.parallel.interleaved_1f1b import InterleavedPipelineScheduler, ScheduleStep, OpType
+from dist_llm.engine.checkpoint import save_distributed_checkpoint, load_and_reshard_checkpoint
 
 __all__ = [
     "ModelConfig",
     "TrainingConfig",
     "LlamaForCausalLM",
+    "ZeRO3Linear",
+    "ZeRO3ModuleWrapper",
+    "RingAttentionEngine",
+    "InterleavedPipelineScheduler",
+    "ScheduleStep",
+    "OpType",
+    "save_distributed_checkpoint",
+    "load_and_reshard_checkpoint",
 ]
 
 
