@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="100%" style="background:#090d16; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <linearGradient id="tpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="ppGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#6d28d9" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="dpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#d97706" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Title Badge -->
+  <rect x="40" y="25" width="920" height="55" rx="8" fill="#131b2e" stroke="#1e293b" stroke-width="1.5"/>
+  <text x="60" y="58" fill="#38bdf8" font-size="18" font-weight="700">🚀 Distributed LLM 4D Parallelism &amp; Ring All-Reduce Architecture</text>
+  <text x="660" y="58" fill="#94a3b8" font-size="13">TP × PP × DP × SP • 2·(P-1)/P·N·B Optimal Bound</text>
+
+  <!-- Left: Tensor Parallelism (Intra-Node NVLink) -->
+  <rect x="40" y="105" width="280" height="460" rx="10" fill="url(#tpGrad)" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="60" y="135" fill="#60a5fa" font-size="15" font-weight="700">Tensor Parallelism (TP=8)</text>
+  <text x="60" y="155" fill="#93c5fd" font-size="12">Intra-Node NVLink 4.0 (900 GB/s) • Megatron-LM</text>
+
+  <g transform="translate(60, 180)">
+    <rect width="240" height="70" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+    <text x="15" y="28" fill="#bfdbfe" font-size="13" font-weight="600">Column Parallel Linear</text>
+    <text x="15" y="48" fill="#94a3b8" font-size="11">W = [W_1 | W_2 | ... | W_k] (Weights Sharded)</text>
+    <text x="15" y="62" fill="#38bdf8" font-size="10">Forward: Identity | Backward: All-Reduce</text>
+  </g>
+
+  <g transform="translate(60, 265)">
+    <rect width="240" height="70" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+    <text x="15" y="28" fill="#bfdbfe" font-size="13" font-weight="600">Row Parallel Linear</text>
+    <text x="15" y="48" fill="#94a3b8" font-size="11">W = [W_1; W_2; ...; W_k] (Row Sliced)</text>
+    <text x="15" y="62" fill="#38bdf8" font-size="10">Forward: All-Reduce | Backward: Identity</text>
+  </g>
+
+  <g transform="translate(60, 350)">
+    <rect width="240" height="85" rx="6" fill="#1e293b" stroke="#60a5fa" stroke-width="1"/>
+    <text x="15" y="26" fill="#93c5fd" font-size="12" font-weight="700">Sequence Parallelism (SP)</text>
+    <text x="15" y="44" fill="#cbd5e1" font-size="11">Shards LayerNorm &amp; Dropout [S/N_SP]</text>
+    <text x="15" y="62" fill="#cbd5e1" font-size="11">Ring Attention KV Rotation for 128K context</text>
+    <text x="15" y="76" fill="#34d399" font-size="10">Eliminates activation memory duplication</text>
+  </g>
+
+  <g transform="translate(60, 450)">
+    <rect width="240" height="85" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1"/>
+    <text x="15" y="26" fill="#bfdbfe" font-size="12" font-weight="700">Fused Operations</text>
+    <text x="15" y="46" fill="#94a3b8" font-size="11">SwiGLU Activation (x·silu(gate))</text>
+    <text x="15" y="64" fill="#94a3b8" font-size="11">Rotary Embeddings (RoPE) &amp; RMSNorm</text>
+  </g>
+
+  <!-- Middle: Pipeline Parallelism (1F1B Schedule) -->
+  <rect x="345" y="105" width="310" height="460" rx="10" fill="url(#ppGrad)" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="365" y="135" fill="#c084fc" font-size="15" font-weight="700">Pipeline Parallelism (PP)</text>
+  <text x="365" y="155" fill="#d8b4fe" font-size="12">Inter-Node 1F1B Schedule • Bubble Bound F &lt; 11%</text>
+
+  <g transform="translate(365, 180)">
+    <rect width="270" height="90" rx="6" fill="#2e1065" stroke="#a855f7" stroke-width="1"/>
+    <text x="15" y="28" fill="#e9d5ff" font-size="13" font-weight="600">1F1B Steady-State Engine</text>
+    <text x="15" y="48" fill="#c084fc" font-size="11">Alternates 1 Forward and 1 Backward step</text>
+    <text x="15" y="66" fill="#d8b4fe" font-size="11">Peak Activation Memory capped at P stages</text>
+    <text x="15" y="80" fill="#a855f7" font-size="10">F_bubble = (P - 1) / (M + P - 1)</text>
+  </g>
+
+  <g transform="translate(365, 285)">
+    <rect width="270" height="135" rx="6" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="1"/>
+    <text x="15" y="26" fill="#e9d5ff" font-size="12" font-weight="700">Dual Stream Comm Hiding</text>
+    <text x="15" y="46" fill="#c084fc" font-size="11">Stream 0: Tensor Core GEMM Math</text>
+    <text x="15" y="64" fill="#c084fc" font-size="11">Stream 1: InfiniBand P2P Boundary Send</text>
+    <text x="15" y="82" fill="#cbd5e1" font-size="11">Event Sync: cudaEventRecord &amp; Wait</text>
+    <text x="15" y="102" fill="#34d399" font-size="11">Zero GPU compute starvation</text>
+    <text x="15" y="120" fill="#94a3b8" font-size="10">Bandwidth: 400 Gbps NDR RDMA</text>
+  </g>
+
+  <g transform="translate(365, 435)">
+    <rect width="270" height="100" rx="6" fill="#2e1065" stroke="#c084fc" stroke-width="1"/>
+    <text x="15" y="26" fill="#e9d5ff" font-size="12" font-weight="700">Fault Tolerance &amp; Health</text>
+    <text x="15" y="46" fill="#cbd5e1" font-size="11">Frobenius norm Inf/NaN quick-check</text>
+    <text x="15" y="64" fill="#cbd5e1" font-size="11">Pinned host memory async checkpointing</text>
+    <text x="15" y="82" fill="#38bdf8" font-size="10">Zero-stall background NVMe / S3 flush</text>
+  </g>
+
+  <!-- Right: Data Parallelism (ZeRO-1/2/3 & Ring All-Reduce) -->
+  <rect x="680" y="105" width="280" height="460" rx="10" fill="url(#dpGrad)" stroke="#10b981" stroke-width="1.5"/>
+  <text x="700" y="135" fill="#34d399" font-size="15" font-weight="700">ZeRO &amp; Ring All-Reduce</text>
+  <text x="700" y="155" fill="#6ee7b7" font-size="12">Optimizer &amp; Gradient Sharding (ZeRO-1/2/3)</text>
+
+  <g transform="translate(700, 180)">
+    <rect width="240" height="85" rx="6" fill="#0f291e" stroke="#10b981" stroke-width="1"/>
+    <text x="15" y="26" fill="#a7f3d0" font-size="12" font-weight="700">ZeRO-1: Optimizer Sharding</text>
+    <text x="15" y="44" fill="#6ee7b7" font-size="11">Master weights &amp; Adam states sharded</text>
+    <text x="15" y="62" fill="#cbd5e1" font-size="11">Memory: 4Φ + 12Φ / N_DP</text>
+    <text x="15" y="76" fill="#34d399" font-size="10">4x memory reduction with zero extra comm</text>
+  </g>
+
+  <g transform="translate(700, 280)">
+    <rect width="240" height="85" rx="6" fill="#0f291e" stroke="#10b981" stroke-width="1"/>
+    <text x="15" y="26" fill="#a7f3d0" font-size="12" font-weight="700">ZeRO-2: Gradient Sharding</text>
+    <text x="15" y="44" fill="#6ee7b7" font-size="11">Gradients reduced &amp; partitioned directly</text>
+    <text x="15" y="62" fill="#cbd5e1" font-size="11">Memory: 2Φ + 14Φ / N_DP</text>
+    <text x="15" y="76" fill="#34d399" font-size="10">Eliminates duplicate gradient buffers</text>
+  </g>
+
+  <g transform="translate(700, 380)">
+    <rect width="240" height="155" rx="6" fill="#0f291e" stroke="#34d399" stroke-width="1.5"/>
+    <text x="15" y="26" fill="#a7f3d0" font-size="13" font-weight="700">Ring All-Reduce Engine</text>
+    <text x="15" y="46" fill="#6ee7b7" font-size="11">• Phase 1: Scatter-Reduce (P-1 steps)</text>
+    <text x="15" y="64" fill="#6ee7b7" font-size="11">• Phase 2: All-Gather (P-1 steps)</text>
+    <text x="15" y="84" fill="#fbbf24" font-size="11">Volume = 2 · (P-1)/P · N · B</text>
+    <text x="15" y="102" fill="#cbd5e1" font-size="11">Throughput: Independent of cluster size!</text>
+    <text x="15" y="122" fill="#38bdf8" font-size="11">Measured MFU: 49.07% on 64x H100</text>
+    <text x="15" y="140" fill="#a7f3d0" font-size="10">Target: 42-52% in production</text>
+  </g>
+</svg>

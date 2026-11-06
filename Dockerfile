@@ -24,3 +24,4 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY . /workspace
 
 CMD ["bash", "run_distributed.sh", "2", "50"]
+
