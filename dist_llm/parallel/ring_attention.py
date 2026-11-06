@@ -146,3 +146,4 @@ class RingAttentionEngine:
         O_local = acc_O * inv_l
 
         return O_local
+

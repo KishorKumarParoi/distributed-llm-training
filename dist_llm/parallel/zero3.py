@@ -163,3 +163,4 @@ class ZeRO3ModuleWrapper(nn.Module):
     def get_memory_reduction_factor(self) -> float:
         """Returns theoretical parameter memory reduction (approx equal to DP world size)."""
         return float(self.dp_world_size)
+

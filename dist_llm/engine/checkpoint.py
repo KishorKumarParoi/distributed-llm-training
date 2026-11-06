@@ -118,3 +118,4 @@ def load_and_reshard_checkpoint(
         model.load_state_dict(resharded_state_dict, strict=False)
 
     return resharded_state_dict
+

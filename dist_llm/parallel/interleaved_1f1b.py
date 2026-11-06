@@ -164,3 +164,4 @@ class InterleavedPipelineScheduler:
             "bubble_time_saved_percent": round(bubble_reduction, 2),
             "activation_memory_bound": f"O({self.P} * {self.v}) activations",
         }
+
